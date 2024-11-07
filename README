@@ -1,0 +1,71 @@
+WELCOME TO THE EPIDRIVER KERNEL MODULE!
+
+-- General introduction --
+
+Here you will find instructions on how to set up and run the following
+kernel module.
+
+The Epidriver module allows you to generate an infinite sequence of random
+bytes through a device file. The device file in question is named 'epidriver'
+and can be found in the path "/dev/epidriver" after its installation.
+
+The module has been separated into 4 distinct levels described below.
+
+-- Description of the exisiting levels --
+
+Level 1: Returns an infinite sequence of random numbers.
+Level 2: Returns an infinite sequence of random ASCII characters (extended
+ASCII included).
+Level 3: Returns an infinite sequence of random bytes like /dev/urandom. It
+utilizes the cryptographically secure get_random_bytes() linux function.
+Level 4: Returns an infinite sequence of random elements from a user given
+alphabet. Such an alphabet is given by setting the 'alphabet' module parameter
+to a string of wanted possible characters.
+
+Note that by default, the module level is set on level 3 (or 4 if using
+alphabet). Module levels 1 and 2 can be tested by setting the 'level' module
+parameter to either 1 or 2 depending on wanted use case.
+
+-- How to install and run the module --
+
+    1. Run the make command in folder containing given files in order to
+    create loadable kernel module object file ('epidriver.ko') and its
+    necessities.
+
+    2. Once done, the module can be loaded to the kernel using
+    "sudo insmod epidriver.ko".
+    Note that a device file will be automatically generated in the
+    "/dev" folder and will be the file which can be used to communicate with
+    the driver (through commands such as cat).
+    As mentioned in the level description above, it is possible to set an
+    alphabet to use. To do so, the 'alphabet' parameter must be set when
+    running insmod command.
+
+    Example: sudo insmod epidriver.ko alphabet='abcdef'
+
+    For the particular case where you would like to run level 1 or 2 of
+    module, do as so: sudo insmod epidriver.ko level=1
+
+    3. To communicate with the driver, run commands such as:
+        * cat /dev/epidriver
+        * or dd to limit number of bytes returned to user.
+
+    4. The module can (rather should) be unloaded using the command
+    "sudo rmmod epidriver". It deletes automatically the module's device file.
+
+    5. The 'clean' target of the Makefile can be used to delete all kernel
+    object files from the directory.
+
+
+-- Simplifying tests with make --
+
+make targets have been added to test all possible module use cases:
+    1. 'test' which loads the module in its default level (level 3).
+    2. 'test_levelX' (replace X by number between 1 and 4) which loads the
+    module in the corresponding level.
+
+All make test targets first unload the module from kernel (even if it might not
+yet be loaded) and then load it. A log of the recent kernel messages is given
+to give user information on the state of the module installation.
+
+Enjoy!
